@@ -1,0 +1,101 @@
+<svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 人体轮廓 -->
+  <path 
+    d="M100,30 
+       C128,30 140,50 140,70
+       C140,90 130,100 125,110
+       L120,140 L130,200 L120,280 L125,350 L115,400
+       L85,400 L75,350 L80,280 L70,200 L80,140
+       L75,110 C70,100 60,90 60,70
+       C60,50 72,30 100,30z" 
+    fill="#ffd6c5" 
+    stroke="#e38f7c" 
+    stroke-width="1" />
+  
+  <!-- 头部 -->
+  <ellipse cx="100" cy="25" rx="25" ry="25" fill="#ffd6c5" stroke="#e38f7c" stroke-width="1" />
+  
+  <!-- 大脑 -->
+  <ellipse cx="100" cy="17" rx="18" ry="15" fill="#ffb6af" stroke="#e38f7c" stroke-width="0.5" opacity="0.8" />
+  
+  <!-- 颈部 -->
+  <rect x="90" y="40" width="20" height="10" fill="#ffd6c5" stroke="#e38f7c" stroke-width="0" />
+  
+  <!-- 肺部 -->
+  <path 
+    d="M85,110 
+       C80,120 75,130 75,140
+       L85,145 C90,130 95,120 95,110z" 
+    fill="#fca7a7" 
+    stroke="#e38f7c" 
+    stroke-width="0.5" />
+  <path 
+    d="M115,110 
+       C120,120 125,130 125,140
+       L115,145 C110,130 105,120 105,110z" 
+    fill="#fca7a7" 
+    stroke="#e38f7c" 
+    stroke-width="0.5" />
+  
+  <!-- 心脏 -->
+  <path 
+    d="M100,120 
+       C105,115 115,110 115,125
+       C115,135 100,145 100,145
+       C100,145 85,135 85,125
+       C85,110 95,115 100,120z" 
+    fill="#f75e5e" 
+    stroke="#e73c3c" 
+    stroke-width="0.5" />
+  
+  <!-- 胃 -->
+  <ellipse cx="100" cy="165" rx="15" ry="10" fill="#f3d2b0" stroke="#d8a97f" stroke-width="0.5" transform="rotate(-15,100,165)" />
+  
+  <!-- 肝脏 -->
+  <path 
+    d="M85,150 
+       C70,155 70,170 80,175
+       C90,180 85,160 85,150z" 
+    fill="#a05a2c" 
+    stroke="#8e4621" 
+    stroke-width="0.5" />
+  
+  <!-- 胰腺 -->
+  <ellipse cx="95" cy="175" rx="12" ry="5" fill="#efd1a8" stroke="#d8a97f" stroke-width="0.5" transform="rotate(-5,95,175)" />
+  
+  <!-- 肠道 -->
+  <path 
+    d="M95,180 
+       C90,185 85,190 90,195
+       C95,200 105,200 110,195
+       C115,190 110,185 105,180" 
+    fill="#e4c5a2" 
+    stroke="#d8a97f" 
+    stroke-width="0.5" 
+    fill-opacity="0.8" />
+  <path 
+    d="M90,200 
+       C85,205 85,210 90,215
+       C95,220 105,220 110,215
+       C115,210 115,205 110,200" 
+    fill="#e4c5a2" 
+    stroke="#d8a97f" 
+    stroke-width="0.5" 
+    fill-opacity="0.8" />
+  
+  <!-- 左手 -->
+  <line x1="75" y1="110" x2="55" y2="150" stroke="#ffd6c5" stroke-width="10" stroke-linecap="round" />
+  <line x1="55" y1="150" x2="50" y2="185" stroke="#ffd6c5" stroke-width="8" stroke-linecap="round" />
+  
+  <!-- 右手 -->
+  <line x1="125" y1="110" x2="145" y2="150" stroke="#ffd6c5" stroke-width="10" stroke-linecap="round" />
+  <line x1="145" y1="150" x2="150" y2="185" stroke="#ffd6c5" stroke-width="8" stroke-linecap="round" />
+  
+  <!-- 左腿 -->
+  <line x1="85" y1="280" x2="75" y2="340" stroke="#ffd6c5" stroke-width="15" stroke-linecap="round" />
+  <line x1="75" y1="340" x2="75" y2="390" stroke="#ffd6c5" stroke-width="12" stroke-linecap="round" />
+  
+  <!-- 右腿 -->
+  <line x1="115" y1="280" x2="125" y2="340" stroke="#ffd6c5" stroke-width="15" stroke-linecap="round" />
+  <line x1="125" y1="340" x2="125" y2="390" stroke="#ffd6c5" stroke-width="12" stroke-linecap="round" />
+</svg> 
