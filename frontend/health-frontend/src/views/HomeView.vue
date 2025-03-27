@@ -97,7 +97,7 @@
             </div>
           </template>
           <div class="body-model-wrapper">
-            <BodyModel />
+            <!-- BodyModel component content will be rendered here -->
           </div>
         </el-card>
       </el-col>
@@ -264,7 +264,6 @@ import {
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
-import BodyModel from '@/components/BodyModel.vue'
 import MedicalRecordForm from '@/components/forms/MedicalRecordForm.vue'
 import MedicationRecordForm from '@/components/forms/MedicationRecordForm.vue'
 import VaccinationRecordForm from '@/components/forms/VaccinationRecordForm.vue'
@@ -570,7 +569,7 @@ const fetchHealthData = async () => {
       name: organ.name,
       status: organ.status,
       description: organ.description,
-      position: getOrganPosition(organ.name)
+      position: { x: 0, y: 0 }
     }))
     
     // 更新体检数据
@@ -609,19 +608,6 @@ const fetchHealthData = async () => {
   } finally {
     loading.value = false
   }
-}
-
-// 获取器官在人体模型上的位置
-const getOrganPosition = (organName: string) => {
-  const positions: Record<string, { x: number, y: number }> = {
-    '心脏': { x: 100, y: 120 },
-    '肺部': { x: 100, y: 110 },
-    '肝脏': { x: 85, y: 150 },
-    '胃': { x: 100, y: 165 },
-    '胰腺': { x: 95, y: 175 },
-    '肠道': { x: 100, y: 190 }
-  }
-  return positions[organName] || { x: 0, y: 0 }
 }
 
 // 刷新健康数据

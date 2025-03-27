@@ -223,20 +223,32 @@ const departments = [
 const fetchRecordDetail = async (id: string) => {
   loading.value = true
   try {
-    const response = await fetch(`/api/records/medical/${id}`)
+    const response = await fetch(`/api/medical/${id}/`, {
+      credentials: 'include'
+    })
+    
+    if (!response.ok) {
+      throw new Error('获取记录失败')
+    }
+    
     const data = await response.json()
     
-    if (data.success) {
-      form.value = {
-        ...form.value,
-        ...data.data,
-        attachments: data.data.attachments?.map((item: any) => ({
-          name: item.name,
-          url: item.url
-        })) || []
-      }
-    } else {
-      ElMessage.error(data.message || '获取记录详情失败')
+    form.value = {
+      visitDate: data.visit_date,
+      hospital: data.hospital,
+      department: data.department,
+      doctor: data.doctor,
+      chiefComplaint: data.chief_complaint,
+      diagnosis: data.diagnosis,
+      treatment: data.treatment,
+      followUpDate: data.follow_up_date,
+      cost: data.cost,
+      notes: data.notes,
+      attachments: data.attachments?.map((item: any) => ({
+        name: item.name,
+        url: item.file,
+        uid: item.id
+      })) || []
     }
   } catch (error) {
     console.error('获取记录详情失败:', error)
@@ -255,41 +267,91 @@ const handleSubmit = async () => {
     
     submitting.value = true
     try {
+      // 更正API路径，使用后端提供的真实API端点
+      const payload = {
+        visit_date: form.value.visitDate,
+        hospital: form.value.hospital,
+        department: form.value.department,
+        doctor: form.value.doctor,
+        chief_complaint: form.value.chiefComplaint,
+        diagnosis: form.value.diagnosis,
+        treatment: form.value.treatment,
+        follow_up_date: form.value.followUpDate || null,
+        cost: form.value.cost,
+        notes: form.value.notes
+      }
+      
       const url = isEdit.value
-        ? `/api/records/medical/${route.params.id}`
-        : '/api/records/medical'
+        ? `/api/medical/${route.params.id}/`
+        : '/api/medical/'
       
       const response = await fetch(url, {
         method: isEdit.value ? 'PUT' : 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
         },
-        body: JSON.stringify(form.value)
+        credentials: 'include',
+        body: JSON.stringify(payload)
       })
       
       const data = await response.json()
-      if (data.success) {
+      
+      if (response.ok) {
         ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
-        router.back()
+        
+        // 如果有附件需要上传，先处理附件上传
+        if (form.value.attachments && form.value.attachments.length > 0) {
+          // 获取新创建的记录ID
+          const recordId = isEdit.value ? route.params.id : data.id
+          
+          // 上传附件
+          for (const attachment of form.value.attachments) {
+            if (attachment.raw) {
+              const formData = new FormData()
+              formData.append('file', attachment.raw)
+              formData.append('record', recordId as string)
+              formData.append('name', attachment.name)
+              
+              await fetch('/api/attachments/', {
+                method: 'POST',
+                headers: {
+                  'X-CSRFToken': document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+                },
+                credentials: 'include',
+                body: formData
+              })
+            }
+          }
+        }
+        
+        router.push('/records/medical')
       } else {
-        ElMessage.error(data.message || (isEdit.value ? '更新失败' : '创建失败'))
+        // 处理错误响应
+        const errorMsg = typeof data === 'object' 
+          ? Object.values(data).flat().join(', ') 
+          : '提交失败，请检查表单'
+        ElMessage.error(errorMsg)
       }
     } catch (error) {
       console.error(isEdit.value ? '更新失败:' : '创建失败:', error)
-      ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
+      ElMessage.error('提交失败，请检查网络连接')
     } finally {
       submitting.value = false
     }
   })
 }
 
-// 处理文件上传成功
+// 处理文件上传
 const handleUploadSuccess = (response: any, file: UploadFile) => {
-  if (response.success) {
-    ElMessage.success('上传成功')
-  } else {
-    ElMessage.error(response.message || '上传失败')
-  }
+  // 这里只是暂存文件，实际上传会在表单提交时进行
+  form.value.attachments.push({
+    name: file.name,
+    size: file.size,
+    raw: file.raw,
+    uid: file.uid
+  })
+  ElMessage.success('文件已添加')
 }
 
 // 处理文件上传失败

@@ -2,6 +2,7 @@
   <div class="physical-exam-form">
     <div class="page-header">
       <div class="page-title">{{ isEdit ? '编辑体检记录' : '新建体检记录' }}</div>
+      <el-button @click="router.back()">返回</el-button>
     </div>
 
     <div class="app-card">
@@ -24,6 +25,7 @@
                   type="date"
                   placeholder="选择日期"
                   :disabled-date="disableFutureDate"
+                  value-format="YYYY-MM-DD"
                   style="width: 100%"
                 />
               </el-form-item>
@@ -123,20 +125,19 @@
             />
           </el-form-item>
 
-          <el-form-item label="医生建议" prop="advice">
+          <el-form-item label="医生建议" prop="doctor_advice">
             <el-input
-              v-model="form.advice"
+              v-model="form.doctor_advice"
               type="textarea"
               :rows="4"
               placeholder="请输入医生建议"
             />
           </el-form-item>
 
-          <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="form.status">
+          <el-form-item label="状态" prop="result">
+            <el-radio-group v-model="form.result">
               <el-radio label="normal">正常</el-radio>
               <el-radio label="abnormal">异常</el-radio>
-              <el-radio label="pending">待复查</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
@@ -147,11 +148,9 @@
           <el-form-item label="体检报告" prop="attachments">
             <el-upload
               v-model:file-list="fileList"
-              :action="uploadUrl"
-              :headers="uploadHeaders"
+              action="#"
+              :http-request="handleCustomUpload"
               :before-upload="beforeUpload"
-              :on-success="handleUploadSuccess"
-              :on-error="handleUploadError"
               :on-remove="handleRemove"
               multiple
             >
@@ -183,9 +182,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, FormInstance, UploadProps, UploadUserFile } from 'element-plus'
+import { ElMessage, FormInstance, UploadProps, UploadUserFile, UploadFile, UploadRequestOptions } from 'element-plus'
 import { Upload } from '@element-plus/icons-vue'
-import axios from 'axios'
 
 const route = useRoute()
 const router = useRouter()
@@ -195,6 +193,7 @@ const isEdit = computed(() => route.params.id !== undefined)
 const loading = ref(false)
 const submitting = ref(false)
 const fileList = ref<UploadUserFile[]>([])
+const pendingUploads = ref<File[]>([])
 
 // 表单数据
 const form = reactive({
@@ -207,8 +206,8 @@ const form = reactive({
   blood_sugar: undefined,
   heart_rate: undefined,
   summary: '',
-  advice: '',
-  status: 'normal',
+  doctor_advice: '',
+  result: 'normal',
   attachments: [] as { id: number; name: string; url: string }[]
 })
 
@@ -227,7 +226,7 @@ const rules = {
       trigger: 'blur'
     }
   ],
-  status: [{ required: true, message: '请选择状态', trigger: 'change' }],
+  result: [{ required: true, message: '请选择状态', trigger: 'change' }],
   summary: [{ required: true, message: '请输入体检总结', trigger: 'blur' }]
 }
 
@@ -244,13 +243,7 @@ const disableFutureDate = (date: Date) => {
   return date > new Date()
 }
 
-// 上传相关配置
-const uploadUrl = '/api/upload'
-const uploadHeaders = {
-  // 如果需要认证token
-  // Authorization: `Bearer ${localStorage.getItem('token')}`
-}
-
+// 上传前验证
 const beforeUpload: UploadProps['beforeUpload'] = (file) => {
   const isValidType = ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)
   const isLt10M = file.size / 1024 / 1024 < 10
@@ -266,23 +259,30 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
   return true
 }
 
-const handleUploadSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  form.attachments.push({
-    id: response.id,
-    name: uploadFile.name,
-    url: response.url
+// 自定义上传处理
+const handleCustomUpload = (options: UploadRequestOptions) => {
+  // 暂存文件，等到表单提交时一起上传
+  pendingUploads.value.push(options.file as File)
+  // 添加到表单显示
+  fileList.value.push({
+    name: (options.file as File).name,
+    uid: Date.now().toString(),
+    status: 'ready',
   })
-  ElMessage.success('上传成功')
 }
 
-const handleUploadError: UploadProps['onError'] = () => {
-  ElMessage.error('上传失败')
-}
-
-const handleRemove: UploadProps['onRemove'] = (file) => {
-  const index = form.attachments.findIndex(item => item.name === file.name)
-  if (index !== -1) {
-    form.attachments.splice(index, 1)
+// 处理文件移除
+const handleRemove: UploadProps['onRemove'] = (file: UploadFile) => {
+  // 从待上传列表移除
+  const pendingIndex = pendingUploads.value.findIndex(f => f.name === file.name)
+  if (pendingIndex !== -1) {
+    pendingUploads.value.splice(pendingIndex, 1)
+  }
+  
+  // 如果是已有的附件，从表单数据中移除
+  const existingIndex = form.attachments.findIndex(item => item.name === file.name)
+  if (existingIndex !== -1) {
+    form.attachments.splice(existingIndex, 1)
   }
 }
 
@@ -290,21 +290,72 @@ const handleRemove: UploadProps['onRemove'] = (file) => {
 const fetchExamDetail = async (id: string) => {
   loading.value = true
   try {
-    const response = await axios.get(`/api/records/physical/${id}`)
-    Object.assign(form, response.data)
-    // 设置文件列表
-    if (response.data.attachments) {
-      fileList.value = response.data.attachments.map((item: any) => ({
+    const response = await fetch(`/api/physical-exam/${id}/`, {
+      credentials: 'include'
+    })
+    
+    if (!response.ok) {
+      throw new Error('获取体检记录失败')
+    }
+    
+    const data = await response.json()
+    
+    // 更新表单数据
+    form.exam_date = data.exam_date
+    form.exam_type = data.exam_type
+    form.hospital = data.hospital
+    form.height = data.height
+    form.weight = data.weight
+    form.blood_pressure = data.blood_pressure
+    form.blood_sugar = data.blood_sugar
+    form.heart_rate = data.heart_rate
+    form.summary = data.summary
+    form.doctor_advice = data.doctor_advice
+    form.result = data.result
+    
+    // 设置附件列表
+    if (data.attachments && data.attachments.length > 0) {
+      form.attachments = data.attachments
+      fileList.value = data.attachments.map((item: any) => ({
         name: item.name,
-        url: item.url
+        url: item.url,
+        uid: item.id
       }))
     }
   } catch (error) {
-    ElMessage.error('获取记录详情失败')
     console.error('获取记录详情失败:', error)
+    ElMessage.error('获取记录详情失败')
   } finally {
     loading.value = false
   }
+}
+
+// 上传附件
+const uploadAttachments = async (examId: string) => {
+  if (pendingUploads.value.length === 0) return
+  
+  const uploadPromises = pendingUploads.value.map(async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('physical_exam', examId)
+    formData.append('name', file.name)
+    
+    const response = await fetch('/api/physical-exam-attachments/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+      },
+      credentials: 'include',
+      body: formData
+    })
+    
+    if (!response.ok) {
+      throw new Error(`上传文件 ${file.name} 失败`)
+    }
+  })
+  
+  await Promise.all(uploadPromises)
+  pendingUploads.value = [] // 清空待上传列表
 }
 
 // 提交表单
@@ -316,15 +367,39 @@ const handleSubmit = async () => {
       submitting.value = true
       try {
         const url = isEdit.value
-          ? `/api/records/physical/${route.params.id}`
-          : '/api/records/physical'
-        const method = isEdit.value ? 'put' : 'post'
+          ? `/api/physical-exam/${route.params.id}/`
+          : '/api/physical-exam/'
         
-        await axios[method](url, form)
+        const response = await fetch(url, {
+          method: isEdit.value ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+          },
+          credentials: 'include',
+          body: JSON.stringify(form)
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(
+            typeof errorData === 'object' 
+              ? Object.values(errorData).flat().join(', ') 
+              : '提交失败'
+          )
+        }
+        
+        const data = await response.json()
+        
+        // 上传新附件
+        if (pendingUploads.value.length > 0) {
+          await uploadAttachments(data.id.toString())
+        }
+        
         ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
         router.push('/records/physical')
       } catch (error: any) {
-        ElMessage.error(error.response?.data?.message || '操作失败')
+        ElMessage.error(error.message || '操作失败')
         console.error('提交失败:', error)
       } finally {
         submitting.value = false
@@ -349,6 +424,18 @@ onMounted(() => {
 <style scoped>
 .physical-exam-form {
   padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 500;
 }
 
 .form-section {

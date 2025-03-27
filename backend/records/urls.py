@@ -18,7 +18,7 @@ router.register(r'medication', MedicationRecordViewSet)
 router.register(r'vaccination', VaccinationRecordViewSet)
 router.register(r'physical-exam', PhysicalExamViewSet)
 router.register(r'attachments', MedicalAttachmentViewSet)
-router.register(r'overview', HealthOverviewAPI, basename='overview')
+router.register(r'health-overview', HealthOverviewAPI, basename='health-overview')
 
 app_name = 'records'
 
@@ -27,4 +27,6 @@ urlpatterns = [
     # 示例路由配置
     path('list/', RecordListView.as_view(), name='record_list'),
     path('create/', RecordCreateView.as_view(), name='record_create'),
+    # 添加健康概览特定接口的直接访问路径
+    path('abnormal-organs/', HealthOverviewAPI.as_view({'get': 'abnormal_organs'}), name='abnormal-organs'),
 ]

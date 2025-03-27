@@ -9,6 +9,7 @@ from drf_spectacular.views import (
     SpectacularRedocView
 )
 from .views import HealthCheckView, health_check
+from records.views import HealthOverviewAPI
 
 # 初始化DRF默认路由器（自动生成API根视图）
 router = routers.DefaultRouter(trailing_slash=False)
@@ -22,7 +23,9 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # 应用模块路由（分模块管理）
     path('api/users/', include('users.urls')),
-    path('api/records/', include('records.urls')),
+    path('api/', include('records.urls')),
+    # 添加直接访问的异常器官数据API
+    path('api/abnormal-organs/', HealthOverviewAPI.as_view({'get': 'abnormal_organs'}), name='abnormal-organs'),
     # API文档生成端点
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

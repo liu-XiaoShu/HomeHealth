@@ -68,21 +68,21 @@
             </div>
           </template>
           <div class="actions-grid">
-            <el-button class="action-btn" @click="navigateTo('/records/create')">
+            <el-button class="action-btn" @click="navigateTo('/records/medical/new')">
               <el-icon><DocumentAdd /></el-icon>
               记录就诊
             </el-button>
-            <el-button class="action-btn" @click="navigateTo('/records/medication')">
+            <el-button class="action-btn" @click="navigateTo('/records/medication/new')">
               <el-icon><Calendar /></el-icon>
-              用药提醒
+              添加用药
             </el-button>
-            <el-button class="action-btn" @click="navigateTo('/records/physical')">
+            <el-button class="action-btn" @click="navigateTo('/records/physical/new')">
               <el-icon><DataAnalysis /></el-icon>
-              体检报告
+              添加体检
             </el-button>
-            <el-button class="action-btn" @click="navigateTo('/family')">
+            <el-button class="action-btn" @click="navigateTo('/records/vaccination/new')">
               <el-icon><UserFilled /></el-icon>
-              家庭成员
+              疫苗接种
             </el-button>
           </div>
         </el-card>
@@ -94,12 +94,41 @@
           <template #header>
             <div class="card-header">
               <h3>健康状况</h3>
-              <el-button type="text" @click="refreshBodyModel">
+              <el-button type="text" @click="refreshHealthStatus">
                 <el-icon><Refresh /></el-icon>
               </el-button>
             </div>
           </template>
-          <BodyModel ref="bodyModelRef" />
+          <div class="health-status-container">
+            <div v-if="loading" class="loading-container">
+              <el-icon class="is-loading"><Loading /></el-icon>
+              <span>加载中...</span>
+            </div>
+            <div v-else-if="abnormalItems.length > 0" class="abnormal-items">
+              <h4>健康异常提示</h4>
+              <el-alert
+                v-for="item in abnormalItems"
+                :key="item.id"
+                :title="item.name"
+                :description="item.description"
+                :type="item.status === 'danger' ? 'error' : 'warning'"
+                :closable="false"
+                show-icon
+                class="health-alert"
+              />
+            </div>
+            <div v-else class="normal-health">
+              <el-result
+                icon="success"
+                title="健康状况良好"
+                sub-title="没有发现异常指标，请继续保持良好的生活习惯"
+              >
+                <template #extra>
+                  <el-button type="primary" @click="navigateTo('/records/physical')">查看体检记录</el-button>
+                </template>
+              </el-result>
+            </div>
+          </div>
         </el-card>
       </div>
 
@@ -160,7 +189,6 @@ import {
   TitleComponent
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import BodyModel from '@/components/BodyModel.vue'
 import { useUserStore } from '@/stores/user'
 import { 
   User, 
@@ -175,6 +203,7 @@ import {
   Loading,
   ArrowRight
 } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 // 注册必要的echarts组件
 echarts.use([
@@ -188,9 +217,9 @@ echarts.use([
 
 const router = useRouter()
 const userStore = useUserStore()
-const bodyModelRef = ref(null)
 const healthTrendChart = ref(null)
 const loading = ref(true)
+const abnormalItems = ref([])
 
 // 用户数据
 const userData = reactive({
@@ -209,14 +238,6 @@ const healthStats = reactive({
 
 // 即将到来的事件
 const upcomingEvents = ref([])
-
-// 3D人体模型相关
-const refreshBodyModel = () => {
-  if (bodyModelRef.value) {
-    // 刷新3D模型状态
-    fetchHealthStatus()
-  }
-}
 
 // 获取用户欢迎语
 const greeting = computed(() => {
@@ -468,18 +489,35 @@ const fetchUpcomingEvents = async () => {
 }
 
 // 获取健康状态
-const fetchHealthStatus = async () => {
-  // 这里可以添加获取健康状态的API调用
-  // 目前在BodyModel组件内部自行处理
+const refreshHealthStatus = async () => {
+  loading.value = true
+  try {
+    const response = await fetch('/api/abnormal-organs/', {
+      credentials: 'include'
+    })
+    
+    if (!response.ok) {
+      throw new Error('获取健康状况失败')
+    }
+    
+    const data = await response.json()
+    abnormalItems.value = data.abnormal_organs || []
+  } catch (error) {
+    console.error('获取健康状况数据失败:', error)
+    ElMessage.error('获取健康状况数据失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 生命周期钩子
 onMounted(async () => {
-  // 获取必要数据
-  loading.value = true
-  await fetchUserData()
-  await fetchHealthStats()
-  await fetchUpcomingEvents()
+  await Promise.all([
+    fetchUserData(),
+    fetchHealthStats(),
+    fetchUpcomingEvents(),
+    refreshHealthStatus()
+  ])
   
   // 初始化图表
   nextTick(() => {
@@ -761,5 +799,45 @@ onMounted(async () => {
   .stats-grid, .actions-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.health-status-container {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.loading-container .el-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: var(--el-color-primary);
+}
+
+.abnormal-items {
+  padding: 0 16px;
+}
+
+.abnormal-items h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #606266;
+  font-weight: 500;
+}
+
+.health-alert {
+  margin-bottom: 12px;
+}
+
+.normal-health {
+  padding: 24px;
 }
 </style> 

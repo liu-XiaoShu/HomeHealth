@@ -10,6 +10,10 @@ import MedicationRecords from '@/views/records/MedicationRecords.vue'
 import VaccinationRecords from '@/views/records/VaccinationRecords.vue'
 import PhysicalExams from '@/views/records/PhysicalExams.vue'
 import PhysicalExamReport from '@/views/records/PhysicalExamReport.vue'
+import MedicalRecordForm from '@/views/records/MedicalRecordForm.vue'
+import MedicationRecordForm from '@/views/records/MedicationRecordForm.vue'
+import VaccinationRecordForm from '@/views/records/VaccinationRecordForm.vue'
+import PhysicalExamForm from '@/views/records/PhysicalExamForm.vue'
 import Profile from '@/views/user/Profile.vue'
 import Settings from '@/views/user/Settings.vue'
 import Health from '@/views/Health.vue'
@@ -37,32 +41,84 @@ const routes: RouteRecordRaw[] = [
     component: Register,
     meta: { requiresAuth: false }
   },
+  // 就医记录路由
   {
-    path: '/medical-records',
+    path: '/records/medical',
     name: 'medical-records',
     component: MedicalRecords,
     meta: { requiresAuth: true }
   },
   {
-    path: '/medication-records',
+    path: '/records/medical/new',
+    name: 'medical-record-new',
+    component: MedicalRecordForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/records/medical/:id/edit',
+    name: 'medical-record-edit',
+    component: MedicalRecordForm,
+    meta: { requiresAuth: true }
+  },
+  // 用药记录路由
+  {
+    path: '/records/medication',
     name: 'medication-records',
     component: MedicationRecords,
     meta: { requiresAuth: true }
   },
   {
-    path: '/vaccination-records',
+    path: '/records/medication/new',
+    name: 'medication-record-new',
+    component: MedicationRecordForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/records/medication/:id/edit',
+    name: 'medication-record-edit',
+    component: MedicationRecordForm,
+    meta: { requiresAuth: true }
+  },
+  // 疫苗接种路由
+  {
+    path: '/records/vaccination',
     name: 'vaccination-records',
     component: VaccinationRecords,
     meta: { requiresAuth: true }
   },
   {
-    path: '/physical-exams',
+    path: '/records/vaccination/new',
+    name: 'vaccination-record-new',
+    component: VaccinationRecordForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/records/vaccination/:id/edit',
+    name: 'vaccination-record-edit',
+    component: VaccinationRecordForm,
+    meta: { requiresAuth: true }
+  },
+  // 体检记录路由
+  {
+    path: '/records/physical',
     name: 'physical-exams',
     component: PhysicalExams,
     meta: { requiresAuth: true }
   },
   {
-    path: '/physical-exams/:id/report',
+    path: '/records/physical/new',
+    name: 'physical-exam-new',
+    component: PhysicalExamForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/records/physical/:id/edit',
+    name: 'physical-exam-edit',
+    component: PhysicalExamForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/records/physical/:id/report',
     name: 'physical-exam-report',
     component: PhysicalExamReport,
     meta: { requiresAuth: true }
