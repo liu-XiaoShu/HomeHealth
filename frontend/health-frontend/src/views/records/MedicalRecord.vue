@@ -150,9 +150,9 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import axios from '@/utils/axios'
-import type { MedicalRecord, PaginatedResponse } from '@/types/records'
+// import type { MedicalRecord, PaginatedResponse } from '@/types/records'
 
 export default defineComponent({
   name: 'MedicalRecord',
@@ -161,13 +161,13 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false)
-    const records = ref<MedicalRecord[]>([])
+    const records = ref([])
     const total = ref(0)
     const page = ref(1)
     const pageSize = ref(10)
     const dialogVisible = ref(false)
-    const dialogType = ref<'add' | 'edit'>('add')
-    const formRef = ref<FormInstance>()
+    const dialogType = ref('add')
+    const formRef = ref()
     const form = ref<Partial<MedicalRecord>>({})
     const rules = {
       visit_date: [{ required: true, message: '请选择就诊日期', trigger: 'blur' }],
@@ -270,17 +270,17 @@ export default defineComponent({
       }
     }
 
-    const handleSizeChange = (val: number) => {
+    const handleSizeChange = (val) => {
       pageSize.value = val
       fetchRecords()
     }
 
-    const handleCurrentChange = (val: number) => {
+    const handleCurrentChange = (val) => {
       page.value = val
       fetchRecords()
     }
 
-    const getDepartmentLabel = (value: string) => {
+    const getDepartmentLabel = (value) => {
       const option = departmentOptions.find(opt => opt.value === value)
       return option ? option.label : value
     }

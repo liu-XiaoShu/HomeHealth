@@ -80,10 +80,10 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import { useRecordsStore } from '@/stores/records'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
@@ -91,7 +91,7 @@ import dayjs from 'dayjs'
 const route = useRoute()
 const router = useRouter()
 const recordsStore = useRecordsStore()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const loading = ref(false)
 
 const isEdit = computed(() => !!route.params.id)
@@ -101,7 +101,7 @@ const form = reactive({
   record_type: '',
   date: '',
   description: '',
-  attachments: [] as string[]
+  attachments: [] 
 })
 
 const rules = {
@@ -131,7 +131,7 @@ onMounted(async () => {
         ...record,
         date: dayjs(record.date).format('YYYY-MM-DD')
       })
-    } catch (error: any) {
+    } catch (error) {
       ElMessage.error(error || '获取记录详情失败')
       router.push('/records')
     } finally {
@@ -153,7 +153,7 @@ const handleSubmit = async () => {
       ElMessage.success('创建成功')
     }
     router.push('/records')
-  } catch (error: any) {
+  } catch (error) {
     ElMessage.error(error || (isEdit.value ? '更新失败' : '创建失败'))
   }
 }
@@ -173,7 +173,7 @@ const beforeUpload = (file: File) => {
   return true
 }
 
-const handleUploadSuccess = (response: any) => {
+const handleUploadSuccess = (response) => {
   form.attachments.push(response.url)
   ElMessage.success('上传成功')
 }

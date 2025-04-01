@@ -45,7 +45,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { onMounted } from 'vue'
 import { useRecordsStore } from '@/stores/records'
 import { Edit, Delete } from '@element-plus/icons-vue'
@@ -56,19 +56,19 @@ const recordsStore = useRecordsStore()
 onMounted(async () => {
   try {
     await recordsStore.getRecords()
-  } catch (error: any) {
+  } catch (error) {
     ElMessage.error(error || '获取记录列表失败')
   }
 })
 
-const handleDelete = async (row: any) => {
+const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm('确定要删除这条记录吗？', '提示', {
       type: 'warning'
     })
     await recordsStore.deleteRecord(row.id)
     ElMessage.success('删除成功')
-  } catch (error: any) {
+  } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error(error || '删除失败')
     }

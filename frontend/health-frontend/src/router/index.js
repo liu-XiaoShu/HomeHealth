@@ -1,8 +1,7 @@
-// 修改后的src/router/index.ts完整代码
+// 修改后的路由配置代码
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import type { RouteRecordRaw, RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
+import Home from '@/views/Home.vue'
 import Login from '@/views/auth/Login.vue'
 import Register from '@/views/auth/Register.vue'
 import MedicalRecords from '@/views/records/MedicalRecords.vue'
@@ -17,16 +16,21 @@ import PhysicalExamForm from '@/views/records/PhysicalExamForm.vue'
 import Profile from '@/views/user/Profile.vue'
 import Settings from '@/views/user/Settings.vue'
 import Health from '@/views/Health.vue'
+import Test from '@/views/Test.vue'
 
 // 不需要认证的路由
-const publicRoutes = ['/login', '/register', '/forgot-password', '/health']
+const publicRoutes = ['/login', '/register', '/forgot-password', '/health', '/test']
 
 // 路由配置
-const routes: RouteRecordRaw[] = [
+const routes = [
   {
     path: '/',
+    redirect: '/login'
+  },
+  {
+    path: '/home',
     name: 'home',
-    component: HomeView,
+    component: Home,
     meta: { requiresAuth: true }
   },
   {
@@ -142,6 +146,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/test',
+    name: 'test',
+    component: Test,
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/views/NotFound.vue'),
@@ -154,19 +164,8 @@ const router = createRouter({
   routes
 })
 
-// 强制重定向处理
-function redirectToLogin(next: NavigationGuardNext) {
-  console.log('强制重定向到登录页')
-  next({ path: '/login', replace: true })
-}
-
-function redirectToHome(next: NavigationGuardNext) {
-  console.log('已登录，强制重定向到首页')
-  next({ path: '/', replace: true })
-}
-
 // 增强的导航守卫
-router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   const isAuthRoute = publicRoutes.includes(to.path)
@@ -191,23 +190,15 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
   // 情况1：未登录用户访问需要认证的页面
   if (requiresAuth && !authStore.isAuthenticated) {
     console.log('未登录用户尝试访问需要认证的页面')
-    return redirectToLogin(next)
+    return next({ path: '/login', query: { redirect: to.fullPath } })
   }
 
   // 情况2：已登录用户访问登录页或注册页
   if (authStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
     console.log('已登录用户尝试访问登录页或注册页')
-    return redirectToHome(next)
+    return next({ path: '/home' })
   }
 
-  // 情况3：根路径特殊处理
-  if (to.path === '/' && !authStore.isAuthenticated) {
-    console.log('未登录用户尝试访问根路径')
-    return redirectToLogin(next)
-  }
-
-  // 其他情况正常导航
-  console.log('导航至:', to.path)
   next()
 })
 

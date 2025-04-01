@@ -130,16 +130,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const loading = ref(false)
 const submitting = ref(false)
 const medicalRecords = ref([])

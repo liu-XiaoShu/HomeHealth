@@ -2,7 +2,7 @@
   <div class="medical-report">
     <!-- 报告头部 -->
     <div class="report-header">
-      <div class="back-button" @click="router.back()">
+      <div class="back-button" @click="router.back()" v-if="showBackButton">
         <el-icon><ArrowLeft /></el-icon>
       </div>
       <div class="title">体检报告</div>
@@ -100,30 +100,26 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, onMounted, defineProps, watch } from 'vue'
+<script setup>
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft, More, VideoCamera, Download } from '@element-plus/icons-vue'
 import { format } from 'date-fns'
-import { recordsApi } from '@/api/records'
+import { getReportDetails } from '@/api/records'
 
-const props = defineProps<{
-  reportId: string
-}>()
+const props = defineProps({
+  reportId: {
+    type: String,
+    required: true
+  },
+  showBackButton: {
+    type: Boolean,
+    default: true
+  }
+})
 
 const router = useRouter()
-
-interface AbnormalIssue {
-  name: string
-  severity: 'mild' | 'moderate' | 'severe'
-  description: string
-  suggestion: string
-  position: {
-    top: number
-    left: number
-  }
-}
 
 // 模拟数据
 const report = ref({
@@ -160,46 +156,14 @@ const metrics = ref([
 ])
 
 // 异常项
-const abnormalIssues = ref<AbnormalIssue[]>([
-  {
-    name: '嗜酸性粒细胞值偏高',
-    severity: 'mild',
-    description: '',
-    suggestion: '定期复查血常规。',
-    position: { top: 25, left: 30 }
-  },
-  {
-    name: '肝囊肿',
-    severity: 'moderate',
-    description: '',
-    suggestion: '定期复查肝脏彩超。',
-    position: { top: 45, left: 25 }
-  },
-  {
-    name: '脂肪肝',
-    severity: 'moderate',
-    description: '总胆固醇值偏高(5.23mmol/L)(参考值≤5.2)。',
-    suggestion: '控制饮食和健康的生活方式，心内科随诊。',
-    position: { top: 45, left: 68 }
-  },
-  {
-    name: '窦性心动过缓',
-    severity: 'mild',
-    description: '',
-    suggestion: '心内科随诊。',
-    position: { top: 35, left: 58 }
-  },
-  {
-    name: '血脂异常',
-    severity: 'moderate',
-    description: '血脂异常是一类较常见的疾病，是人体内脂蛋白的代谢异常，主要包括总胆固醇和低密度脂蛋白胆固醇、甘油三酯升高和或高密度脂蛋白胆固醇降低等。血脂异常是导致动脉粥样硬化的重要因素之一，是冠心病和缺血性脑卒中的独立危险因素。',
-    suggestion: '控制饮食和健康的生活方式。',
-    position: { top: 55, left: 32 }
-  }
+const abnormalIssues = ref([
+  { name: '血压偏高', level: 'warning', desc: '收缩压160mmHg，舒张压95mmHg', advice: '减少盐分摄入，增加运动，必要时服用降压药' },
+  { name: '总胆固醇偏高', level: 'warning', desc: '6.5mmol/L（正常范围<5.2mmol/L）', advice: '控制油脂摄入，增加膳食纤维，服用降脂药' },
+  { name: '血糖偏高', level: 'info', desc: '空腹血糖6.3mmol/L（正常范围3.9-6.1mmol/L）', advice: '控制碳水化合物摄入，增加运动' }
 ])
 
 // 格式化日期
-const formatDate = (date: Date | string | undefined) => {
+const formatDate = (date) => {
   if (!date) return ''
   return format(new Date(date), 'yyyy-MM-dd')
 }
@@ -210,7 +174,7 @@ const loadReportData = async () => {
   
   try {
     // 从API获取数据
-    const data = await recordsApi.getPhysicalExamReport(props.reportId)
+    const data = await getReportDetails(props.reportId)
     
     // 更新报告数据
     report.value = {
@@ -248,7 +212,7 @@ const loadReportData = async () => {
     
     // 如果有异常数据，更新异常项
     if (data.abnormal_items && data.abnormal_items.length) {
-      abnormalIssues.value = data.abnormal_items.map((item: any) => ({
+      abnormalIssues.value = data.abnormal_items.map((item) => ({
         name: item.name,
         severity: item.severity || 'moderate',
         description: item.description || '',

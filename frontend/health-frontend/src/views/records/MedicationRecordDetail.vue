@@ -53,18 +53,18 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, Edit } from '@element-plus/icons-vue'
-import type { MedicationRecord } from '@/types/records'
+// import type { MedicationRecord } from '@/types/records'
 
 const router = useRouter()
 const route = useRoute()
-const id = route.params.id as string
+const id = route.params.id 
 const loading = ref(false)
-const record = ref<MedicationRecord>({} as MedicationRecord)
+const record = ref({} )
 
 // 获取记录详情
 const fetchRecord = async () => {
@@ -82,7 +82,7 @@ const fetchRecord = async () => {
 
 // 获取状态对应的类型
 const getStatusType = (status: MedicationRecord['status']) => {
-  const types: Record<string, string> = {
+  const types = {
     'active': 'success',
     'completed': 'info',
     'discontinued': 'warning'
@@ -92,7 +92,7 @@ const getStatusType = (status: MedicationRecord['status']) => {
 
 // 获取状态标签文本
 const getStatusLabel = (status: MedicationRecord['status']) => {
-  const labels: Record<string, string> = {
+  const labels = {
     'active': '进行中',
     'completed': '已完成',
     'discontinued': '已停用'

@@ -178,15 +178,15 @@
   </el-form>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, UploadFile } from 'element-plus'
+// import type { FormInstance, UploadFile } from 'element-plus'
 
 const emit = defineEmits(['submit', 'cancel'])
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 // 表单数据
 const form = reactive({
@@ -199,15 +199,15 @@ const form = reactive({
   diastolicPressure: '80',
   heartRate: 75,
   temperature: 36.5,
-  examItems: ['bloodRoutine', 'urineRoutine', 'electrocardiogram'] as string[],
+  examItems: ['bloodRoutine', 'urineRoutine', 'electrocardiogram'] ,
   result: 'normal',
   abnormalItems: [
     { name: '', value: '', reference: '' }
   ],
   doctorAdvice: '',
-  nextExamDate: null as Date | null,
+  nextExamDate: null  | null,
   notes: '',
-  reports: [] as UploadFile[]
+  reports: [] 
 })
 
 // 验证规则
@@ -232,7 +232,7 @@ const calculateBMI = computed(() => {
 })
 
 // 文件列表
-const fileList = ref<UploadFile[]>([])
+const fileList = ref([])
 
 // 添加异常项目
 const addAbnormalItem = () => {
@@ -240,7 +240,7 @@ const addAbnormalItem = () => {
 }
 
 // 移除异常项目
-const removeAbnormalItem = (index: number) => {
+const removeAbnormalItem = (index) => {
   if (form.abnormalItems.length > 1) {
     form.abnormalItems.splice(index, 1)
   }

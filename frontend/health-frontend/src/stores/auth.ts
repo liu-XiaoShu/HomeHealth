@@ -37,7 +37,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
-  const token = ref<string | null>(null)
+  const token = ref<string | null>(localStorage.getItem('token'))
   const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'))
   const profile = ref<UserProfile | null>(null)
   const loading = ref<boolean>(false)
@@ -91,14 +91,16 @@ export const useAuthStore = defineStore('auth', () => {
           console.log('恢复用户信息成功:', user.value)
         } catch (e) {
           console.error('解析用户信息失败:', e)
-          localStorage.removeItem('user')
+          clearAuth()
         }
       }
       
-      // 重新加载用户信息
-      loadUser()
+      // 获取用户数据
+      return loadUser()
     } else {
       console.log('未找到存储的令牌，用户未登录')
+      clearAuth()
+      return Promise.resolve()
     }
   }
 
@@ -111,10 +113,12 @@ export const useAuthStore = defineStore('auth', () => {
       })
       console.log('加载用户信息成功:', response.data)
       user.value = response.data
+      localStorage.setItem('user', JSON.stringify(response.data))
     } catch (error) {
       console.error('加载用户信息失败:', error)
       console.log('由于加载失败，执行登出操作')
-      logout()
+      clearAuth()
+      return router.push('/login')
     }
   }
 
@@ -179,7 +183,28 @@ export const useAuthStore = defineStore('auth', () => {
 
   // 注册
   const register = async (data: RegisterData) => {
-    await axios.post(`${API_URL}/users/register/`, data)
+    try {
+      loading.value = true
+      error.value = null
+      console.log('注册请求开始...')
+      console.log('注册数据:', data)
+      
+      const response = await axios.post(`${API_URL}/users/register/`, data)
+      console.log('注册响应:', response.data)
+      
+      if (response.data.user) {
+        console.log('注册成功，返回用户数据')
+        return response.data
+      }
+      
+      return response.data
+    } catch (err: any) {
+      console.error('注册失败:', err)
+      error.value = err.response?.data?.detail || '注册失败，请检查输入'
+      throw err
+    } finally {
+      loading.value = false
+    }
   }
 
   // 登出
@@ -226,22 +251,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   )
 
-  // 如果有token，设置axios默认headers
-  if (token.value) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
-  }
-
-  // 初始化：从localStorage恢复用户信息
-  const storedUser = localStorage.getItem('user')
-  if (storedUser) {
-    try {
-      user.value = JSON.parse(storedUser)
-    } catch (e) {
-      console.error('解析用户信息失败:', e)
-      localStorage.removeItem('user')
-    }
-  }
-
   return {
     user,
     token,
@@ -253,10 +262,10 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    loadUser,
-    setAuth,
-    clearAuth,
     initializeAuth,
-    refreshAccessToken
+    loadUser,
+    refreshAccessToken,
+    clearAuth,
+    setAuth
   }
 })

@@ -82,7 +82,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 
@@ -107,14 +107,14 @@ const privacySettings = reactive({
 })
 
 // 更新主题色
-const updateTheme = (color: string) => {
+const updateTheme = (color) => {
   const style = document.documentElement.style
   style.setProperty('--el-color-primary', color)
   
   // 生成不同深度的主题色
-  const mix = (color1: string, color2: string, weight: number) => {
-    const d2h = (d: number) => d.toString(16).padStart(2, '0')
-    const h2d = (h: string) => parseInt(h, 16)
+  const mix = (color1, color2, weight) => {
+    const d2h = (d) => d.toString(16).padStart(2, '0')
+    const h2d = (h) => parseInt(h, 16)
     
     let color = '#'
     for (let i = 0; i < 3; i++) {
@@ -133,7 +133,7 @@ const updateTheme = (color: string) => {
 }
 
 // 切换深色模式
-const toggleDarkMode = (value: boolean) => {
+const toggleDarkMode = (value) => {
   document.documentElement.classList.toggle('dark', value)
 }
 

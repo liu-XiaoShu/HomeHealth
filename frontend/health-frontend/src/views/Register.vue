@@ -94,17 +94,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock, Message } from '@element-plus/icons-vue'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const loading = ref(false)
 
 const formData = reactive({
@@ -144,7 +144,7 @@ const handleSubmit = async () => {
       ElMessage.success('注册成功')
       router.push('/')
     }
-  } catch (error: any) {
+  } catch (error) {
     if (error.response?.data?.detail) {
       ElMessage.error(error.response.data.detail)
     } else {

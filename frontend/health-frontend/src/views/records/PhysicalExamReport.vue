@@ -4,17 +4,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import MedicalReport from '@/components/MedicalReport.vue'
 
 const route = useRoute()
-const reportId = ref<string>('')
+const reportId = ref('')
 
 onMounted(() => {
   if (route.params.id) {
-    reportId.value = route.params.id as string
+    reportId.value = route.params.id 
   }
 })
 </script>

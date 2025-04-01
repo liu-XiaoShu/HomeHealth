@@ -20,11 +20,14 @@ urlpatterns = [
     path('admin/docs/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     # REST框架认证端点（登录/注销）
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # 应用模块路由（分模块管理）
+    path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # 用户认证API
     path('api/users/', include('users.urls')),
-    path('api/', include('records.urls')),
-    # 添加直接访问的异常器官数据API
+    # 记录相关API
+    path('api/records/', include('records.urls', namespace='records')),
+    # 健康概览API
+    path('api/overview/', HealthOverviewAPI.as_view({'get': 'list'}), name='health-overview'),
+    # 异常器官数据API
     path('api/abnormal-organs/', HealthOverviewAPI.as_view({'get': 'abnormal_organs'}), name='abnormal-organs'),
     # API文档生成端点
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

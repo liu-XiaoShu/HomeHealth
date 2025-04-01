@@ -122,7 +122,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -134,23 +134,23 @@ const loading = ref(false)
 
 // 记录数据
 const record = ref<{
-  id?: number
-  visitDate: string
-  hospital: string
-  department: string
-  doctor: string
-  chiefComplaint: string
-  diagnosis: string
-  treatment: string
-  followUpDate?: string
-  cost?: number
-  notes?: string
+  id?
+  visitDate
+  hospital
+  department
+  doctor
+  chiefComplaint
+  diagnosis
+  treatment
+  followUpDate?
+  cost?
+  notes?
   attachments?: Array<{
-    id: number
-    name: string
-    size: number
-    url: string
-    uploadTime: string
+    id
+    name
+    size
+    url
+    uploadTime
   }>
 }>({
   visitDate: '',
@@ -234,7 +234,7 @@ const previewFile = (file: typeof record.value.attachments[0]) => {
 }
 
 // 格式化文件大小
-const formatFileSize = (bytes: number) => {
+const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 B'
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']

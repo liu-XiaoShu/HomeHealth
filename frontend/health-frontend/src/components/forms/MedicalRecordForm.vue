@@ -90,15 +90,15 @@
   </el-form>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, UploadFile } from 'element-plus'
+// import type { FormInstance, UploadFile } from 'element-plus'
 
 const emit = defineEmits(['submit', 'cancel'])
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 // 表单数据
 const form = reactive({
@@ -108,9 +108,9 @@ const form = reactive({
   doctorName: '',
   reason: '',
   diagnosis: '',
-  prescriptions: [] as string[],
+  prescriptions: [] ,
   notes: '',
-  attachments: [] as UploadFile[]
+  attachments: [] 
 })
 
 // 验证规则
@@ -125,7 +125,7 @@ const rules = {
 const prescriptionInputVisible = ref(false)
 const prescriptionInputValue = ref('')
 const prescriptionInputRef = ref()
-const fileList = ref<UploadFile[]>([])
+const fileList = ref([])
 
 // 显示处方药物输入框
 const showPrescriptionInput = () => {
@@ -145,7 +145,7 @@ const addPrescription = () => {
 }
 
 // 移除处方药物
-const removePrescription = (index: number) => {
+const removePrescription = (index) => {
   form.prescriptions.splice(index, 1)
 }
 

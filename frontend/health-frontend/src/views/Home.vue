@@ -175,7 +175,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, reactive, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { format } from 'date-fns'

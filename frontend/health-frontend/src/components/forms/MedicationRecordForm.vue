@@ -128,15 +128,15 @@
   </el-form>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
 import { Plus, Minus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, UploadFile } from 'element-plus'
+// import type { FormInstance, UploadFile } from 'element-plus'
 
 const emit = defineEmits(['submit', 'cancel'])
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 // 星期几选项
 const daysOfWeek = [
@@ -156,14 +156,14 @@ const form = reactive({
   specification: '',
   dosage: '',
   startDate: new Date(),
-  endDate: null as Date | null,
+  endDate: null  | null,
   isLongTerm: false,
   reminderDays: [1, 2, 3, 4, 5, 6, 0], // 默认每天提醒
   reminderTimes: [new Date(new Date().setHours(8, 0, 0, 0))], // 默认早上8点提醒
   symptoms: '',
   sideEffects: '',
   notes: '',
-  images: [] as UploadFile[]
+  images: [] 
 })
 
 // 验证规则
@@ -175,7 +175,7 @@ const rules = {
 }
 
 // 文件列表
-const fileList = ref<UploadFile[]>([])
+const fileList = ref([])
 
 // 添加提醒时间
 const addReminderTime = () => {

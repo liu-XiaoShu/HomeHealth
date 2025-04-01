@@ -108,15 +108,15 @@
   </el-form>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, UploadFile } from 'element-plus'
+// import type { FormInstance, UploadFile } from 'element-plus'
 
 const emit = defineEmits(['submit', 'cancel'])
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 // 表单数据
 const form = reactive({
@@ -128,11 +128,11 @@ const form = reactive({
   batchNumber: '',
   manufacturer: '',
   site: 'leftArm',
-  nextDoseDate: null as Date | null,
-  reactions: ['none'] as string[],
+  nextDoseDate: null  | null,
+  reactions: ['none'] ,
   allergyDetails: '',
   notes: '',
-  certificates: [] as UploadFile[]
+  certificates: [] 
 })
 
 // 验证规则
@@ -145,7 +145,7 @@ const rules = {
 }
 
 // 文件列表
-const fileList = ref<UploadFile[]>([])
+const fileList = ref([])
 
 // 处理文件上传
 const handleFileChange = (file: UploadFile) => {

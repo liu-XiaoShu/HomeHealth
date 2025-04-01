@@ -74,7 +74,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="BMI">
-                <el-input :value="calculateBMI" disabled />
+                <el-input :model-value="calculateBMI" disabled />
               </el-form-item>
             </el-col>
           </el-row>
@@ -179,21 +179,21 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, FormInstance, UploadProps, UploadUserFile, UploadFile, UploadRequestOptions } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Upload } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 const isEdit = computed(() => route.params.id !== undefined)
 const loading = ref(false)
 const submitting = ref(false)
-const fileList = ref<UploadUserFile[]>([])
-const pendingUploads = ref<File[]>([])
+const fileList = ref([])
+const pendingUploads = ref([])
 
 // 表单数据
 const form = reactive({
@@ -208,7 +208,7 @@ const form = reactive({
   summary: '',
   doctor_advice: '',
   result: 'normal',
-  attachments: [] as { id: number; name: string; url: string }[]
+  attachments: []
 })
 
 // 表单验证规则
@@ -239,12 +239,12 @@ const calculateBMI = computed(() => {
 })
 
 // 禁用未来日期
-const disableFutureDate = (date: Date) => {
+const disableFutureDate = (date) => {
   return date > new Date()
 }
 
 // 上传前验证
-const beforeUpload: UploadProps['beforeUpload'] = (file) => {
+const beforeUpload = (file) => {
   const isValidType = ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)
   const isLt10M = file.size / 1024 / 1024 < 10
 
@@ -260,19 +260,19 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
 }
 
 // 自定义上传处理
-const handleCustomUpload = (options: UploadRequestOptions) => {
+const handleCustomUpload = (options) => {
   // 暂存文件，等到表单提交时一起上传
-  pendingUploads.value.push(options.file as File)
+  pendingUploads.value.push(options.file)
   // 添加到表单显示
   fileList.value.push({
-    name: (options.file as File).name,
+    name: options.file.name,
     uid: Date.now().toString(),
     status: 'ready',
   })
 }
 
 // 处理文件移除
-const handleRemove: UploadProps['onRemove'] = (file: UploadFile) => {
+const handleRemove = (file) => {
   // 从待上传列表移除
   const pendingIndex = pendingUploads.value.findIndex(f => f.name === file.name)
   if (pendingIndex !== -1) {
@@ -287,7 +287,7 @@ const handleRemove: UploadProps['onRemove'] = (file: UploadFile) => {
 }
 
 // 获取记录详情
-const fetchExamDetail = async (id: string) => {
+const fetchExamDetail = async (id) => {
   loading.value = true
   try {
     const response = await fetch(`/api/physical-exam/${id}/`, {
@@ -316,7 +316,7 @@ const fetchExamDetail = async (id: string) => {
     // 设置附件列表
     if (data.attachments && data.attachments.length > 0) {
       form.attachments = data.attachments
-      fileList.value = data.attachments.map((item: any) => ({
+      fileList.value = data.attachments.map((item) => ({
         name: item.name,
         url: item.url,
         uid: item.id
@@ -331,7 +331,7 @@ const fetchExamDetail = async (id: string) => {
 }
 
 // 上传附件
-const uploadAttachments = async (examId: string) => {
+const uploadAttachments = async (examId) => {
   if (pendingUploads.value.length === 0) return
   
   const uploadPromises = pendingUploads.value.map(async (file) => {
@@ -398,7 +398,7 @@ const handleSubmit = async () => {
         
         ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
         router.push('/records/physical')
-      } catch (error: any) {
+      } catch (error) {
         ElMessage.error(error.message || '操作失败')
         console.error('提交失败:', error)
       } finally {
@@ -416,7 +416,7 @@ const handleCancel = () => {
 // 页面加载时获取详情
 onMounted(() => {
   if (isEdit.value && route.params.id) {
-    fetchExamDetail(route.params.id as string)
+    fetchExamDetail(route.params.id)
   }
 })
 </script>

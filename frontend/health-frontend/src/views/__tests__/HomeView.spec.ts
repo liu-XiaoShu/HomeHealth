@@ -4,42 +4,40 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import HomeView from '../HomeView.vue'
-import { recordsApi } from '@/api/records'
 import { useAuthStore } from '@/stores/auth'
+import * as recordsApi from '@/api/records'
 
 // Mock API调用
 vi.mock('@/api/records', () => ({
-  recordsApi: {
-    getHealthStatistics: vi.fn().mockResolvedValue({
-      data: {
-        medical_records: { total: 5 },
-        medication_records: { total: 3 },
-        vaccination_records: { total: 2 },
-        physical_exams: { total: 1 }
+  getHealthStatistics: vi.fn().mockResolvedValue({
+    data: {
+      medical_records: { total: 5 },
+      medication_records: { total: 3 },
+      vaccination_records: { total: 2 },
+      physical_exams: { total: 1 }
+    }
+  }),
+  getHealthTrends: vi.fn().mockResolvedValue({
+    data: {
+      dates: ['2024-03-01', '2024-03-02', '2024-03-03'],
+      bloodPressure: {
+        systolic: [120, 118, 122],
+        diastolic: [80, 78, 82]
+      },
+      bloodSugar: [5.6, 5.8, 5.7],
+      weight: [70, 70.5, 70.2]
+    }
+  }),
+  getRecentActivities: vi.fn().mockResolvedValue({
+    data: [
+      {
+        id: 1,
+        type: 'medical',
+        description: '普通感冒就医',
+        date: '2024-03-01'
       }
-    }),
-    getHealthTrends: vi.fn().mockResolvedValue({
-      data: {
-        dates: ['2024-03-01', '2024-03-02', '2024-03-03'],
-        bloodPressure: {
-          systolic: [120, 118, 122],
-          diastolic: [80, 78, 82]
-        },
-        bloodSugar: [5.6, 5.8, 5.7],
-        weight: [70, 70.5, 70.2]
-      }
-    }),
-    getRecentActivities: vi.fn().mockResolvedValue({
-      data: [
-        {
-          id: 1,
-          type: 'medical',
-          description: '普通感冒就医',
-          date: '2024-03-01'
-        }
-      ]
-    })
-  }
+    ]
+  })
 }))
 
 // 创建路由实例

@@ -183,7 +183,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -260,18 +260,18 @@ const fetchExamList = async () => {
 }
 
 // 查看详情
-const viewExam = (exam: any) => {
+const viewExam = (exam) => {
   currentExam.value = exam
   dialogVisible.value = true
 }
 
 // 编辑记录
-const editExam = (exam: any) => {
+const editExam = (exam) => {
   router.push(`/records/physical/${exam.id}/edit`)
 }
 
 // 删除记录
-const deleteExam = async (exam: any) => {
+const deleteExam = async (exam) => {
   try {
     await axios.delete(`/api/records/physical/${exam.id}`)
     ElMessage.success('删除成功')
@@ -296,29 +296,29 @@ const resetSearch = () => {
 }
 
 // 分页处理
-const handleSizeChange = (val: number) => {
+const handleSizeChange = (val) => {
   pageSize.value = val
   fetchExamList()
 }
 
-const handleCurrentChange = (val: number) => {
+const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchExamList()
 }
 
 // 排序处理
-const handleSortChange = ({ prop, order }: any) => {
+const handleSortChange = ({ prop, order }) => {
   // 实现排序逻辑
 }
 
 // 格式化日期
-const formatDate = (date: string) => {
+const formatDate = (date) => {
   return format(new Date(date), 'yyyy-MM-dd')
 }
 
 // 获取体检类型标签
-const getExamTypeTag = (type: string) => {
-  const typeMap: { [key: string]: string } = {
+const getExamTypeTag = (type) => {
+  const typeMap = {
     annual: '',
     employment: 'success',
     other: 'info'
@@ -327,8 +327,8 @@ const getExamTypeTag = (type: string) => {
 }
 
 // 获取体检类型标签文本
-const getExamTypeLabel = (type: string) => {
-  const typeMap: { [key: string]: string } = {
+const getExamTypeLabel = (type) => {
+  const typeMap = {
     annual: '年度体检',
     employment: '入职体检',
     other: '其他'
@@ -337,8 +337,8 @@ const getExamTypeLabel = (type: string) => {
 }
 
 // 获取状态标签文本
-const getStatusLabel = (status: string) => {
-  const statusMap: { [key: string]: string } = {
+const getStatusLabel = (status) => {
+  const statusMap = {
     normal: '正常',
     abnormal: '异常',
     pending: '待复查'
@@ -347,7 +347,7 @@ const getStatusLabel = (status: string) => {
 }
 
 // 计算BMI
-const calculateBMI = (height: number, weight: number) => {
+const calculateBMI = (height, weight) => {
   if (!height || !weight) return '-'
   const heightInMeters = height / 100
   const bmi = weight / (heightInMeters * heightInMeters)
@@ -355,7 +355,7 @@ const calculateBMI = (height: number, weight: number) => {
 }
 
 // 查看报告
-const viewReport = (row: any) => {
+const viewReport = (row) => {
   router.push(`/physical-exams/${row.id}/report`)
 }
 

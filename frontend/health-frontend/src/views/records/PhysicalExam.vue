@@ -155,9 +155,9 @@
 import { defineComponent, ref, onMounted, computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance, UploadProps } from 'element-plus'
+// import type { FormInstance, UploadProps } from 'element-plus'
 import axios from '@/utils/axios'
-import type { PhysicalExam, PaginatedResponse } from '@/types/records'
+// import type { PhysicalExam, PaginatedResponse } from '@/types/records'
 
 export default defineComponent({
   name: 'PhysicalExam',
@@ -166,13 +166,13 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false)
-    const records = ref<PhysicalExam[]>([])
+    const records = ref([])
     const total = ref(0)
     const page = ref(1)
     const pageSize = ref(10)
     const dialogVisible = ref(false)
-    const dialogType = ref<'add' | 'edit'>('add')
-    const formRef = ref<FormInstance>()
+    const dialogType = ref('add')
+    const formRef = ref()
     const form = ref<Partial<PhysicalExam>>({})
     const rules = {
       exam_date: [{ required: true, message: '请选择体检日期', trigger: 'blur' }],
@@ -182,7 +182,7 @@ export default defineComponent({
       heart_rate: [{ required: true, message: '请输入心率', trigger: 'blur' }]
     }
 
-    const calculateBMI = (height: number, weight: number) => {
+    const calculateBMI = (height, weight) => {
       if (!height || !weight) return '-'
       const heightInMeters = height / 100
       return (weight / (heightInMeters * heightInMeters)).toFixed(1)
@@ -278,7 +278,7 @@ export default defineComponent({
       return true
     }
 
-    const handleUploadSuccess = (response: any) => {
+    const handleUploadSuccess = (response) => {
       form.value.report_pdf = response.data.url
       ElMessage.success('文件上传成功')
     }
@@ -287,12 +287,12 @@ export default defineComponent({
       ElMessage.error('文件上传失败')
     }
 
-    const handleSizeChange = (val: number) => {
+    const handleSizeChange = (val) => {
       pageSize.value = val
       fetchRecords()
     }
 
-    const handleCurrentChange = (val: number) => {
+    const handleCurrentChange = (val) => {
       page.value = val
       fetchRecords()
     }

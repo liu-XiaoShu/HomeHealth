@@ -65,7 +65,7 @@
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import { User, Lock, Message } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -79,7 +79,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
-    const formRef = ref<FormInstance>()
+    const formRef = ref()
     const loading = ref(false)
     const form = ref({
       username: '',
@@ -88,7 +88,7 @@ export default defineComponent({
       email: ''
     })
 
-    const validatePass = (rule: any, value: string, callback: any) => {
+    const validatePass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
       } else {
@@ -101,7 +101,7 @@ export default defineComponent({
       }
     }
 
-    const validatePass2 = (rule: any, value: string, callback: any) => {
+    const validatePass2 = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'))
       } else if (value !== form.value.password) {

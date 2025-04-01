@@ -15,9 +15,13 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   (config) => {
-    const authStore = useAuthStore()
-    if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
+    try {
+      const authStore = useAuthStore()
+      if (authStore.token) {
+        config.headers.Authorization = `Bearer ${authStore.token}`
+      }
+    } catch (e) {
+      console.error('请求拦截器错误:', e)
     }
     return config
   },
@@ -33,13 +37,20 @@ api.interceptors.response.use(
   },
   async (error) => {
     if (error.response?.status === 401) {
-      const authStore = useAuthStore()
       try {
-        await authStore.refreshAccessToken()
-        const originalRequest = error.config
-        originalRequest.headers.Authorization = `Bearer ${authStore.token}`
-        return api(originalRequest)
+        const authStore = useAuthStore()
+        if (authStore.refreshToken) {
+          // 尝试刷新令牌
+          await authStore.refreshAccessToken()
+          const originalRequest = error.config
+          originalRequest.headers.Authorization = `Bearer ${authStore.token}`
+          return api(originalRequest)
+        } else {
+          throw new Error('无refresh token，无法刷新')
+        }
       } catch (refreshError) {
+        // 刷新失败，清除认证状态并重定向到登录页
+        const authStore = useAuthStore()
         authStore.clearAuth()
         window.location.href = '/login'
         return Promise.reject(refreshError)
@@ -55,7 +66,7 @@ export const healthCheck = () => {
     .then(response => {
       return {
         status: 'healthy',
-        message: response.data.message
+        message: response.data.message || '后端服务正常'
       }
     })
     .catch(error => {
@@ -71,7 +82,7 @@ export const healthCheck = () => {
 export const auth = {
   login: (data: { username: string; password: string }) =>
     api.post('/users/login/', data),
-  register: (data: { username: string; email: string; password: string }) =>
+  register: (data: { username: string; email: string; password: string; password_confirm: string }) =>
     api.post('/users/register/', data),
   logout: () => api.post('/users/logout/'),
   getProfile: () => api.get('/users/me/')
@@ -79,7 +90,7 @@ export const auth = {
 
 // 健康记录相关接口
 export const records = {
-  getList: () => api.get('/records/'),
+  getList: (recordType?: string) => api.get('/records/', { params: { type: recordType } }),
   getDetail: (id: number) => api.get(`/records/${id}/`),
   create: (data: any) => api.post('/records/', data),
   update: (id: number, data: any) => api.put(`/records/${id}/`, data),

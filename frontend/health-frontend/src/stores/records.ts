@@ -1,6 +1,48 @@
 import { defineStore } from 'pinia'
-import { recordsApi } from '@/api/records'
-import type { PhysicalExam, MedicalRecord, MedicationRecord, VaccinationRecord } from '@/api/records'
+import * as recordsApi from '@/api/records'
+
+// 定义记录类型接口
+export interface PhysicalExam {
+  id?: number
+  exam_date: string
+  height?: number
+  weight?: number
+  blood_pressure?: string
+  blood_sugar?: number
+  heart_rate?: number
+  [key: string]: any
+}
+
+export interface MedicalRecord {
+  id?: number
+  visit_date: string
+  hospital: string
+  department: string
+  doctor: string
+  diagnosis: string
+  treatment: string
+  [key: string]: any
+}
+
+export interface MedicationRecord {
+  id?: number
+  medication_name: string
+  dosage: string
+  frequency: string
+  start_date: string
+  end_date?: string
+  is_long_term: boolean
+  [key: string]: any
+}
+
+export interface VaccinationRecord {
+  id?: number
+  vaccine_name: string
+  vaccination_date: string
+  location: string
+  next_dose_date?: string
+  [key: string]: any
+}
 
 interface RecordsState {
   physicalExams: PhysicalExam[]

@@ -44,14 +44,14 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { reactive, ref } from 'vue'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 
 const authStore = useAuthStore()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 const form = reactive({
   username: '',
@@ -76,7 +76,7 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     await authStore.login(form.username, form.password)
     ElMessage.success('登录成功')
-  } catch (error: any) {
+  } catch (error) {
     ElMessage.error(error || '登录失败')
   }
 }

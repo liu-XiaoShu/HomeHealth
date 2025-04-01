@@ -51,10 +51,10 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   House,
   Document,
-  Briefcase as FirstAidKit,
-  Notebook as Medicine,
-  Stamp as Syringe,
-  Odometer as Stethoscope,
+  Briefcase ,
+  Notebook ,
+  Stamp ,
+  Odometer ,
   User,
   Setting
 } from '@element-plus/icons-vue'
@@ -81,7 +81,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
 
-    const handleSelect = (index: string) => {
+    const handleSelect = (index) => {
       router.push(index)
     }
 

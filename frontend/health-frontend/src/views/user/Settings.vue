@@ -198,17 +198,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
-import type { FormInstance } from 'element-plus'
 
 const authStore = useAuthStore()
 const activeTab = ref('security')
 
 // 修改密码表单
-const passwordFormRef = ref<FormInstance>()
+const passwordFormRef = ref()
 const passwordForm = reactive({
   currentPassword: '',
   newPassword: '',
@@ -226,7 +225,7 @@ const passwordRules = {
   confirmPassword: [
     { required: true, message: '请再次输入新密码', trigger: 'blur' },
     {
-      validator: (rule: any, value: string, callback: any) => {
+      validator: (rule, value, callback) => {
         if (value !== passwordForm.newPassword) {
           callback(new Error('两次输入的密码不一致'))
         } else {
@@ -239,7 +238,7 @@ const passwordRules = {
 }
 
 // 绑定手机表单
-const phoneFormRef = ref<FormInstance>()
+const phoneFormRef = ref()
 const phoneForm = reactive({
   phone: '',
   code: ''
@@ -259,7 +258,7 @@ const phoneRules = {
 // 验证码倒计时
 const isCountingDown = ref(false)
 const countDown = ref(60)
-let timer: number | null = null
+let timer = null
 
 // 通知设置
 const notificationSettings = reactive({
@@ -328,7 +327,7 @@ const startCountDown = () => {
   timer = window.setInterval(() => {
     countDown.value--
     if (countDown.value <= 0) {
-      clearInterval(timer as number)
+      clearInterval(timer)
       isCountingDown.value = false
     }
   }, 1000)

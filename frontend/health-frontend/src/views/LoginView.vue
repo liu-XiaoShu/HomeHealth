@@ -49,7 +49,7 @@
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -62,7 +62,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
-    const formRef = ref<FormInstance>()
+    const formRef = ref()
     const loading = ref(false)
     const form = ref({
       username: '',

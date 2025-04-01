@@ -80,7 +80,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -120,8 +120,8 @@ const fetchRecords = async () => {
 }
 
 // 获取状态对应的标签类型
-const getStatusTag = (status: string) => {
-  const statusMap: Record<string, string> = {
+const getStatusTag = (status) => {
+  const statusMap = {
     'active': 'success',
     'completed': '',
     'discontinued': 'warning',
@@ -131,17 +131,17 @@ const getStatusTag = (status: string) => {
 }
 
 // 查看记录
-const viewRecord = (id: number) => {
+const viewRecord = (id) => {
   // TODO: 实现查看详情功能
 }
 
 // 编辑记录
-const editRecord = (id: number) => {
+const editRecord = (id) => {
   // TODO: 跳转到编辑页面
 }
 
 // 删除记录
-const deleteRecord = async (id: number) => {
+const deleteRecord = async (id) => {
   try {
     await ElMessageBox.confirm('确定要删除这条记录吗？', '提示', {
       type: 'warning'
@@ -172,12 +172,12 @@ const resetSearch = () => {
 }
 
 // 分页
-const handleSizeChange = (val: number) => {
+const handleSizeChange = (val) => {
   pageSize.value = val
   fetchRecords()
 }
 
-const handleCurrentChange = (val: number) => {
+const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchRecords()
 }

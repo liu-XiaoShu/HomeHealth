@@ -68,18 +68,18 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, Edit, Download } from '@element-plus/icons-vue'
-import type { VaccinationRecord } from '@/types/records'
+// import type { VaccinationRecord } from '@/types/records'
 
 const router = useRouter()
 const route = useRoute()
-const id = route.params.id as string
+const id = route.params.id 
 const loading = ref(false)
-const record = ref<VaccinationRecord>({} as VaccinationRecord)
+const record = ref({} )
 
 // 获取记录详情
 const fetchRecord = async () => {
@@ -96,7 +96,7 @@ const fetchRecord = async () => {
 }
 
 // 下载附件
-const downloadAttachment = async (attachment: { id: number; url: string }) => {
+const downloadAttachment = async (attachment: { id; url }) => {
   try {
     const response = await fetch(attachment.url)
     if (!response.ok) throw new Error('下载失败')

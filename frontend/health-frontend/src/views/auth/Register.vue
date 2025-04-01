@@ -231,12 +231,12 @@
 }
 </style>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Message, Phone, Lock } from '@element-plus/icons-vue'
-import type { RegisterData } from '@/types/auth'
+// import type { RegisterData } from '@/types/auth'
 import { useAuthStore } from '@/stores/auth'
 import { authApi } from '@/api/auth'
 
@@ -245,7 +245,7 @@ const authStore = useAuthStore()
 const loading = ref(false)
 const registerForm = ref()
 
-const registerData = reactive<RegisterData>({
+const registerData = reactive({
   username: '',
   email: '',
   phone: '',
@@ -254,7 +254,7 @@ const registerData = reactive<RegisterData>({
   confirmPassword: ''
 })
 
-const validatePass2 = (rule: any, value: string, callback: any) => {
+const validatePass2 = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请再次输入密码'))
   } else if (value !== registerData.password) {
@@ -320,7 +320,7 @@ const handleRegister = async () => {
     setTimeout(() => {
       router.push('/login')
     }, 1500)
-  } catch (error: any) {
+  } catch (error) {
     console.error('注册错误:', error)
     if (error.response && error.response.data) {
       // 显示API返回的具体错误信息

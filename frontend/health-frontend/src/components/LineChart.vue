@@ -2,20 +2,20 @@
   <div class="chart-container" ref="chartContainer"></div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import type { EChartsOption, LineSeriesOption } from 'echarts'
+// import type { EChartsOption, LineSeriesOption } from 'echarts'
 
-const props = defineProps<{
-  dates: string[]
-  data: number[] | number[][]
-  labels?: string[]
-  unit?: string
-  title?: string
-}>()
+const props = defineProps({
+  dates[]
+  data[] | number[][]
+  labels?[]
+  unit?
+  title?
+}: {}()
 
-const chartContainer = ref<HTMLElement | null>(null)
+const chartContainer = ref(null)
 let chart: echarts.ECharts | null = null
 
 const initChart = () => {
@@ -29,7 +29,7 @@ const updateChart = () => {
   if (!chart) return
 
   const series: LineSeriesOption[] = Array.isArray(props.data[0])
-    ? (props.data as number[][]).map((data, index) => ({
+    ? (props.data ).map((data, index) => ({
         name: props.labels?.[index] || `数据${index + 1}`,
         type: 'line',
         data: data,
@@ -38,7 +38,7 @@ const updateChart = () => {
     : [{
         name: props.labels?.[0] || '数据',
         type: 'line',
-        data: props.data as number[],
+        data: props.data ,
         smooth: true
       }]
 
@@ -49,10 +49,10 @@ const updateChart = () => {
     },
     tooltip: {
       trigger: 'axis',
-      formatter: (params: any) => {
+      formatter: (params) => {
         const date = props.dates[params[0].dataIndex]
         let result = `${date}<br/>`
-        params.forEach((param: any) => {
+        params.forEach((param) => {
           result += `${param.seriesName}: ${param.value}${props.unit || ''}<br/>`
         })
         return result

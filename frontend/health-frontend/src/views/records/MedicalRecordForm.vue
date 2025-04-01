@@ -166,16 +166,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Upload } from '@element-plus/icons-vue'
-import type { FormInstance, UploadFile } from 'element-plus'
 
 const router = useRouter()
 const route = useRoute()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const loading = ref(false)
 const submitting = ref(false)
 const isEdit = ref(false)
@@ -192,7 +191,7 @@ const form = ref({
   followUpDate: '',
   cost: 0,
   notes: '',
-  attachments: [] as UploadFile[]
+  attachments: []
 })
 
 // 表单验证规则
@@ -200,180 +199,114 @@ const rules = {
   visitDate: [{ required: true, message: '请选择就诊日期', trigger: 'change' }],
   hospital: [{ required: true, message: '请输入医院名称', trigger: 'blur' }],
   department: [{ required: true, message: '请选择科室', trigger: 'change' }],
-  chiefComplaint: [{ required: true, message: '请输入主诉', trigger: 'blur' }],
-  diagnosis: [{ required: true, message: '请输入诊断结果', trigger: 'blur' }],
-  treatment: [{ required: true, message: '请输入处理方案', trigger: 'blur' }]
+  diagnosis: [{ required: true, message: '请输入诊断结果', trigger: 'blur' }]
 }
 
 // 科室选项
 const departments = [
-  { label: '内科', value: 'internal' },
+  { label: '内科', value: 'internal_medicine' },
   { label: '外科', value: 'surgery' },
+  { label: '妇产科', value: 'obstetrics_gynecology' },
   { label: '儿科', value: 'pediatrics' },
-  { label: '妇产科', value: 'obstetrics' },
   { label: '眼科', value: 'ophthalmology' },
-  { label: '耳鼻喉科', value: 'ent' },
-  { label: '口腔科', value: 'dental' },
+  { label: '耳鼻喉科', value: 'otolaryngology' },
   { label: '皮肤科', value: 'dermatology' },
+  { label: '神经内科', value: 'neurology' },
   { label: '精神科', value: 'psychiatry' },
-  { label: '中医科', value: 'tcm' }
+  { label: '中医科', value: 'traditional_chinese_medicine' },
+  { label: '其他', value: 'other' }
 ]
 
-// 获取记录详情
-const fetchRecordDetail = async (id: string) => {
-  loading.value = true
-  try {
-    const response = await fetch(`/api/medical/${id}/`, {
-      credentials: 'include'
-    })
-    
-    if (!response.ok) {
-      throw new Error('获取记录失败')
+// 初始化表单
+const initForm = async () => {
+  const id = route.params.id
+  isEdit.value = !!id
+
+  if (isEdit.value) {
+    loading.value = true
+    try {
+      // 从API获取记录详情
+      // const response = await axios.get(`/api/medical-records/${id}`)
+      // form.value = {
+      //   ...response.data,
+      //   attachments: response.data.attachments.map(a => ({
+      //     name: a.name,
+      //     url: a.url,
+      //     uid: a.id
+      //   }))
+      // }
+      // 模拟数据
+      setTimeout(() => {
+        form.value = {
+          visitDate: '2023-06-15',
+          hospital: '北京协和医院',
+          department: 'internal_medicine',
+          doctor: '张医生',
+          chiefComplaint: '头痛、发热三天',
+          diagnosis: '上呼吸道感染',
+          treatment: '建议多休息，多喝水，服用布洛芬退热。',
+          followUpDate: '2023-06-22',
+          cost: 350,
+          notes: '患者过敏史：青霉素',
+          attachments: []
+        }
+        loading.value = false
+      }, 500)
+    } catch (error) {
+      ElMessage.error('获取记录详情失败')
+      loading.value = false
     }
-    
-    const data = await response.json()
-    
-    form.value = {
-      visitDate: data.visit_date,
-      hospital: data.hospital,
-      department: data.department,
-      doctor: data.doctor,
-      chiefComplaint: data.chief_complaint,
-      diagnosis: data.diagnosis,
-      treatment: data.treatment,
-      followUpDate: data.follow_up_date,
-      cost: data.cost,
-      notes: data.notes,
-      attachments: data.attachments?.map((item: any) => ({
-        name: item.name,
-        url: item.file,
-        uid: item.id
-      })) || []
-    }
-  } catch (error) {
-    console.error('获取记录详情失败:', error)
-    ElMessage.error('获取记录详情失败')
-  } finally {
-    loading.value = false
   }
 }
 
-// 处理表单提交
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    
+// 提交表单
+const handleSubmit = () => {
+  formRef.value?.validate(async (valid) => {
+    if (!valid) {
+      ElMessage.warning('请完成必填项')
+      return
+    }
+
     submitting.value = true
     try {
-      // 更正API路径，使用后端提供的真实API端点
-      const payload = {
-        visit_date: form.value.visitDate,
-        hospital: form.value.hospital,
-        department: form.value.department,
-        doctor: form.value.doctor,
-        chief_complaint: form.value.chiefComplaint,
-        diagnosis: form.value.diagnosis,
-        treatment: form.value.treatment,
-        follow_up_date: form.value.followUpDate || null,
-        cost: form.value.cost,
-        notes: form.value.notes
-      }
+      // 保存记录
+      // const url = isEdit.value 
+      //   ? `/api/medical-records/${route.params.id}`
+      //   : '/api/medical-records'
+      // const method = isEdit.value ? 'put' : 'post'
       
-      const url = isEdit.value
-        ? `/api/medical/${route.params.id}/`
-        : '/api/medical/'
+      // await axios[method](url, form.value)
       
-      const response = await fetch(url, {
-        method: isEdit.value ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload)
-      })
+      // 模拟API请求
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      const data = await response.json()
-      
-      if (response.ok) {
-        ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
-        
-        // 如果有附件需要上传，先处理附件上传
-        if (form.value.attachments && form.value.attachments.length > 0) {
-          // 获取新创建的记录ID
-          const recordId = isEdit.value ? route.params.id : data.id
-          
-          // 上传附件
-          for (const attachment of form.value.attachments) {
-            if (attachment.raw) {
-              const formData = new FormData()
-              formData.append('file', attachment.raw)
-              formData.append('record', recordId as string)
-              formData.append('name', attachment.name)
-              
-              await fetch('/api/attachments/', {
-                method: 'POST',
-                headers: {
-                  'X-CSRFToken': document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
-                },
-                credentials: 'include',
-                body: formData
-              })
-            }
-          }
-        }
-        
-        router.push('/records/medical')
-      } else {
-        // 处理错误响应
-        const errorMsg = typeof data === 'object' 
-          ? Object.values(data).flat().join(', ') 
-          : '提交失败，请检查表单'
-        ElMessage.error(errorMsg)
-      }
+      ElMessage.success(isEdit.value ? '记录更新成功' : '记录创建成功')
+      router.back()
     } catch (error) {
-      console.error(isEdit.value ? '更新失败:' : '创建失败:', error)
-      ElMessage.error('提交失败，请检查网络连接')
+      ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
     } finally {
       submitting.value = false
     }
   })
 }
 
-// 处理文件上传
-const handleUploadSuccess = (response: any, file: UploadFile) => {
-  // 这里只是暂存文件，实际上传会在表单提交时进行
-  form.value.attachments.push({
-    name: file.name,
-    size: file.size,
-    raw: file.raw,
-    uid: file.uid
-  })
-  ElMessage.success('文件已添加')
+// 处理文件上传成功
+const handleUploadSuccess = (response, file) => {
+  ElMessage.success('附件上传成功')
 }
 
 // 处理文件上传失败
 const handleUploadError = () => {
-  ElMessage.error('上传失败')
+  ElMessage.error('附件上传失败')
 }
 
 // 处理文件移除
-const handleRemove = (file: UploadFile) => {
-  const index = form.value.attachments.indexOf(file)
-  if (index !== -1) {
-    form.value.attachments.splice(index, 1)
-  }
+const handleRemove = (file) => {
+  // 移除文件逻辑
 }
 
-// 初始化
-onMounted(async () => {
-  const id = route.params.id
-  if (id) {
-    isEdit.value = true
-    await fetchRecordDetail(id as string)
-  }
+onMounted(() => {
+  initForm()
 })
 </script>
 

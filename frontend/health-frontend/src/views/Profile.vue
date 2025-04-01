@@ -134,12 +134,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, UploadProps } from 'element-plus'
+// import type { FormInstance, UploadProps } from 'element-plus'
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const uploadRef = ref()
 const fileInput = ref()
 const isEditing = ref(false)
@@ -189,7 +189,7 @@ const rules = {
 }
 
 // 格式化日期
-const formatDate = (date: string) => {
+const formatDate = (date) => {
   if (!date) return ''
   return new Date(date).toLocaleDateString()
 }
@@ -259,7 +259,7 @@ const handleAvatarClick = () => {
 }
 
 const handleFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
+  const target = event.target 
   if (target.files) {
     const file = target.files[0]
     beforeAvatarUpload(file) && uploadRef.value.submit()

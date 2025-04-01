@@ -164,7 +164,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -245,17 +245,17 @@ const confirmDelete = async () => {
 }
 
 // 格式化日期
-const formatDate = (date: string) => {
+const formatDate = (date) => {
   return date ? format(new Date(date), 'yyyy-MM-dd') : '-'
 }
 
-const formatDateTime = (date: string) => {
+const formatDateTime = (date) => {
   return date ? format(new Date(date), 'yyyy-MM-dd HH:mm:ss') : '-'
 }
 
 // 获取体检类型标签
-const getExamTypeTag = (type: string) => {
-  const typeMap: { [key: string]: string } = {
+const getExamTypeTag = (type) => {
+  const typeMap: { [key] } = {
     annual: '',
     employment: 'success',
     other: 'info'
@@ -263,8 +263,8 @@ const getExamTypeTag = (type: string) => {
   return typeMap[type] || ''
 }
 
-const getExamTypeLabel = (type: string) => {
-  const typeMap: { [key: string]: string } = {
+const getExamTypeLabel = (type) => {
+  const typeMap: { [key] } = {
     annual: '年度体检',
     employment: '入职体检',
     other: '其他'
@@ -273,8 +273,8 @@ const getExamTypeLabel = (type: string) => {
 }
 
 // 获取状态标签
-const getStatusTag = (status: string) => {
-  const statusMap: { [key: string]: string } = {
+const getStatusTag = (status) => {
+  const statusMap: { [key] } = {
     normal: 'success',
     abnormal: 'danger',
     pending: 'warning'
@@ -282,8 +282,8 @@ const getStatusTag = (status: string) => {
   return statusMap[status] || 'info'
 }
 
-const getStatusLabel = (status: string) => {
-  const statusMap: { [key: string]: string } = {
+const getStatusLabel = (status) => {
+  const statusMap: { [key] } = {
     normal: '正常',
     abnormal: '异常',
     pending: '待复查'
@@ -320,7 +320,7 @@ const isHeartRateAbnormal = computed(() => {
 })
 
 // 获取指标状态说明
-const getBloodPressureStatus = (bp: string) => {
+const getBloodPressureStatus = (bp) => {
   if (!bp) return '未测量'
   const [systolic, diastolic] = bp.split('/').map(Number)
   if (systolic > 140 || diastolic > 90) return '偏高'
@@ -328,14 +328,14 @@ const getBloodPressureStatus = (bp: string) => {
   return '正常'
 }
 
-const getBloodSugarStatus = (sugar: number) => {
+const getBloodSugarStatus = (sugar) => {
   if (!sugar) return '未测量'
   if (sugar > 6.1) return '偏高'
   if (sugar < 3.9) return '偏低'
   return '正常'
 }
 
-const getHeartRateStatus = (rate: number) => {
+const getHeartRateStatus = (rate) => {
   if (!rate) return '未测量'
   if (rate > 100) return '偏快'
   if (rate < 60) return '偏慢'
@@ -343,7 +343,7 @@ const getHeartRateStatus = (rate: number) => {
 }
 
 // 格式化文件大小
-const formatFileSize = (bytes: number) => {
+const formatFileSize = (bytes) => {
   if (!bytes) return '0 B'
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB']

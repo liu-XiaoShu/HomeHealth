@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -19,7 +19,7 @@ import {
   DataZoomComponent
 } from 'echarts/components'
 import * as echarts from 'echarts/core'
-import type { EChartsOption } from 'echarts'
+// import type { EChartsOption } from 'echarts'
 import { ElMessage } from 'element-plus'
 
 // 注册必需的组件
@@ -33,20 +33,20 @@ use([
   DataZoomComponent
 ])
 
-const props = defineProps<{
+const props = defineProps({
   type: 'line' | 'bar'
   data: {
-    categories: string[]
+    categories[]
     series: Array<{
-      name: string
-      data: number[]
-      type?: string
-      color?: string
+      name
+      data[]
+      type?
+      color?
     }>
   }
-}>()
+}: {}()
 
-const chartContainer = ref<HTMLElement>()
+const chartContainer = ref()
 let chart: echarts.ECharts | null = null
 
 // 初始化图表

@@ -130,9 +130,9 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance } from 'element-plus'
+// import type { FormInstance } from 'element-plus'
 import axios from '@/utils/axios'
-import type { MedicationRecord, PaginatedResponse } from '@/types/records'
+// import type { MedicationRecord, PaginatedResponse } from '@/types/records'
 
 export default defineComponent({
   name: 'MedicationRecord',
@@ -141,13 +141,13 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false)
-    const records = ref<MedicationRecord[]>([])
+    const records = ref([])
     const total = ref(0)
     const page = ref(1)
     const pageSize = ref(10)
     const dialogVisible = ref(false)
-    const dialogType = ref<'add' | 'edit'>('add')
-    const formRef = ref<FormInstance>()
+    const dialogType = ref('add')
+    const formRef = ref()
     const form = ref<Partial<MedicationRecord>>({})
 
     const frequencyOptions = [
@@ -241,17 +241,17 @@ export default defineComponent({
       }
     }
 
-    const handleSizeChange = (val: number) => {
+    const handleSizeChange = (val) => {
       pageSize.value = val
       fetchRecords()
     }
 
-    const handleCurrentChange = (val: number) => {
+    const handleCurrentChange = (val) => {
       page.value = val
       fetchRecords()
     }
 
-    const getFrequencyLabel = (value: string) => {
+    const getFrequencyLabel = (value) => {
       const option = frequencyOptions.find(opt => opt.value === value)
       return option ? option.label : value
     }

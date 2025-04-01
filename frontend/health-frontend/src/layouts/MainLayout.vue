@@ -187,7 +187,7 @@
   </el-container>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -222,12 +222,12 @@ const isUserOnline = ref(true)
 // 通知相关
 const notificationsVisible = ref(false)
 const notifications = ref<Array<{
-  id: number
+  id
   type: 'success' | 'warning' | 'info' | 'error'
-  title: string
-  message: string
+  title
+  message
   time: Date
-  read: boolean
+  read
 }>>([
   {
     id: 1,
@@ -263,7 +263,7 @@ const showNotifications = () => {
 }
 
 // 标记通知为已读
-const markAsRead = (id: number) => {
+const markAsRead = (id) => {
   const index = notifications.value.findIndex(notification => notification.id === id)
   if (index !== -1) {
     notifications.value[index].read = true
@@ -285,8 +285,8 @@ const clearAllNotifications = () => {
 }
 
 // 获取通知图标
-const getNotificationIcon = (type: string) => {
-  const iconMap: Record<string, any> = {
+const getNotificationIcon = (type) => {
+  const iconMap = {
     success: SuccessFilled,
     warning: Warning,
     info: Message,

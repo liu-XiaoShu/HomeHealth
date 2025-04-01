@@ -142,15 +142,14 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User, Delete } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
-import type { FormInstance, UploadFile } from 'element-plus'
 
 const authStore = useAuthStore()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const userInfo = ref(authStore.user)
 
 // 表单数据
@@ -159,7 +158,7 @@ const form = reactive({
   nickname: '',
   email: '',
   phone: '',
-  birthdate: null as Date | null,
+  birthdate: null,
   gender: 'prefer_not_to_say',
   height: 0,
   weight: 0,
@@ -171,7 +170,7 @@ const form = reactive({
   },
   allergies: [''],
   notes: '',
-  avatar: null as File | null
+  avatar: null
 })
 
 // 验证规则
@@ -190,8 +189,8 @@ const rules = {
 }
 
 // 处理头像上传
-const handleAvatarChange = (file: UploadFile) => {
-  form.avatar = file.raw as File
+const handleAvatarChange = (file) => {
+  form.avatar = file.raw
   ElMessage.success('头像已选择，点击保存按钮完成更新')
 }
 
@@ -201,7 +200,7 @@ const addAllergy = () => {
 }
 
 // 移除过敏信息
-const removeAllergy = (index: number) => {
+const removeAllergy = (index) => {
   if (form.allergies.length > 1) {
     form.allergies.splice(index, 1)
   }
